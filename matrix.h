@@ -1,3 +1,6 @@
+#ifndef _MAREIX_H_
+#define _MAREIX_H_
+
 #include <vector>
 #include <utility>
 #include <algorithm>
@@ -16,9 +19,12 @@ public:
     matrix(const matrix<ValueType>& m);
     matrix(matrix<ValueType>&& m);
     matrix(const vector<vector<ValueType>>& vec);
+    matrix(vector<vector<ValueType>>&& vec);
 
     matrix<ValueType>& operator=(const matrix<ValueType>& m);
     matrix<ValueType>& operator=(matrix<ValueType>&& m);
+    matrix<ValueType>& operator=(const vector<vector<ValueType>>& vec);
+    matrix<ValueType>& operator=(vector<vector<ValueType>>&& vec);
     bool operator==(const matrix<ValueType>& m);
     bool operator!=(const matrix<ValueType>& m);
 
@@ -29,28 +35,38 @@ public:
     matrix<ValueType>& operator+=(const ValueType& val);
     matrix<ValueType>& operator-=(const ValueType& val);
     matrix<ValueType>& operator*=(const ValueType& val);
-    matrix<ValueType>& operator/=(const ValueType& val); 
+    matrix<ValueType>& operator/=(const ValueType& val);
     vector<ValueType>& operator[](int rowIndex);
-    
+
     matrix<ValueType> multiply(matrix<ValueType>& m); // matrices multiplication
     matrix<ValueType>& invert();
     matrix<ValueType> transpose();
     matrix<ValueType> power(int n);
+
+    matrix<ValueType>& replace_row(vector<ValueType> vec, int index);
+    matrix<ValueType>& replace_col(vector<ValueType> vec, int index);
+    matrix<ValueType>& push_row(vector<ValueType> vec);
+    matrix<ValueType>& push_col(vector<ValueType> vec);
+    vector<ValueType> get_row(int index);
+    vector<ValueType> get_col(int index);
+    matrix<ValueType>& erase_row(int index);
+    matrix<ValueType>& erase_col(int index);
+
 
     matrix<ValueType>& print_r();
     matrix<ValueType>& print_r(std::ostream& os);
     matrix<ValueType>& print_l(); // matlab format
     matrix<ValueType>& print_l(std::ostream& os);
 
-    matrix<ValueType>& setDim(int row, int col); // This doesn't guarantee the matrix data still valid
+    matrix<ValueType>& resize(int row, int col); // This doesn't guarantee the matrix data still valid
     std::pair<int, int> getDim();
     int getR();
     int getC();
     static std::pair<int, int> check_dim(const vector<vector<ValueType>>& vec);
 
-    template <typename T> friend 
+    template <typename T> friend
     std::ostream& operator<<(std::ostream& os,const matrix<T>& m);
-    template <typename T> friend 
+    template <typename T> friend
     matrix<T> subMatrix(matrix<T> m, int row, int col);
 private:
     int rows ; int cols ;
@@ -87,6 +103,69 @@ matrix<ValueType>::matrix(const vector<vector<ValueType>>& vec)
     rows = p.first;
     cols = p.second;
     elements = vec ;
+}
+
+template <typename ValueType>
+matrix<ValueType>::matrix(vector<vector<ValueType>>&& vec)
+{
+    std::pair<int, int> p = check_dim(vec);
+    if(p.first < 0)
+        throw std::length_error("Dimentions error");
+    rows = p.first;
+    cols = p.second;
+    elements = std::move(vec) ;
+}
+
+template <typename ValueType>
+matrix<ValueType>& matrix<ValueType>::operator=(const matrix<ValueType>& m)
+{
+    rows = m.rows; cols = m.cols;
+    elements = m.elements;
+    return *this;
+}
+
+template <typename ValueType>
+matrix<ValueType>& matrix<ValueType>::operator=(matrix<ValueType>&& m)
+{
+    rows = m.rows; cols = m.cols;
+    elements = std::move(m.elements);
+    return *this;
+}
+
+template <typename ValueType>
+matrix<ValueType>& matrix<ValueType>::operator=(const vector<vector<ValueType>>& vec)
+{
+    std::pair<int, int> p = check_dim(vec);
+    if(p.first < 0)
+        throw std::length_error("Dimentions error");
+    rows = p.first;
+    cols = p.second;
+    elements = vec ;
+    return *this;
+}
+
+template <typename ValueType>
+matrix<ValueType>& matrix<ValueType>::operator=(vector<vector<ValueType>>&& vec)
+{
+    std::pair<int, int> p = check_dim(vec);
+    if(p.first < 0)
+        throw std::length_error("Dimentions error");
+    rows = p.first;
+    cols = p.second;
+    elements = std::move(vec) ;
+    return *this;
+}
+
+template <typename ValueType>
+bool matrix<ValueType>::operator==(const matrix<ValueType>& m)
+{
+    return elements == m.elements ;
+}
+
+template <typename ValueType>
+bool matrix<ValueType>::operator!=(const matrix<ValueType>& m)
+{
+    return elements != m.elements ;
 }
 
 template <typename ValueType>
@@ -146,7 +225,7 @@ matrix<ValueType>& matrix<ValueType>::print_l(std::ostream& os)
 }
 
 template <typename ValueType>
-matrix<ValueType>& matrix<ValueType>::setDim(int row, int col)
+matrix<ValueType>& matrix<ValueType>::resize(int row, int col)
 {
     rows = row; cols = col;
     elements.resize(row);
@@ -173,33 +252,7 @@ inline int matrix<ValueType>::getC()
     return cols;
 }
 
-template <typename ValueType>
-matrix<ValueType>& matrix<ValueType>::operator=(const matrix<ValueType>& m)
-{
-    rows = m.rows; cols = m.cols;
-    elements = m.elements;
-    return *this;
-}
 
-template <typename ValueType>
-matrix<ValueType>& matrix<ValueType>::operator=(matrix<ValueType>&& m)
-{
-    rows = m.rows; cols = m.cols;
-    elements = std::move(m.elements);
-    return *this;
-}
-
-template <typename ValueType>
-bool matrix<ValueType>::operator==(const matrix<ValueType>& m)
-{
-    return elements == m.elements ;
-}
-
-template <typename ValueType>
-bool matrix<ValueType>::operator!=(const matrix<ValueType>& m)
-{
-    return elements != m.elements ;
-}
 
 template <typename ValueType>
 matrix<ValueType>& matrix<ValueType>::operator+=(const matrix<ValueType>& m)
@@ -355,7 +408,7 @@ matrix<ValueType>& matrix<ValueType>::invert()
     ValueType signCol = signRow ;
     for(int i = 0; i < rows; i++)
     {
-        for(int j = 0; j < cols; j++) 
+        for(int j = 0; j < cols; j++)
         {
             adj[i][j] = determinant(subMatrix(*this, i, j)) * signCol;
             signCol = -signCol;
@@ -366,10 +419,10 @@ matrix<ValueType>& matrix<ValueType>::invert()
     ValueType det = determinant(*this);
     if(det == static_cast<ValueType>(0))
         throw std::out_of_range("Error: Determinant equal zero");
-    *this = adj.transpose() / det;    
+    *this = adj.transpose() / det;
     return *this;
 }
- 
+
 template <typename ValueType>
 matrix<ValueType> matrix<ValueType>::transpose()
 {
@@ -380,7 +433,7 @@ matrix<ValueType> matrix<ValueType>::transpose()
     return res;
 }
 
-template <typename ValueType> 
+template <typename ValueType>
 std::pair<int, int> matrix<ValueType>::check_dim(const vector<vector<ValueType>>& vec)
 {
     int rows = vec.size();
@@ -389,6 +442,88 @@ std::pair<int, int> matrix<ValueType>::check_dim(const vector<vector<ValueType>>
         if(row.size() != cols)
             return std::make_pair(-1,-1);
     return std::make_pair(rows, cols);
+}
+
+template <typename ValueType>
+matrix<ValueType>& matrix<ValueType>::replace_row(vector<ValueType> vec, int index)
+{
+    if(index < 0 || index >= rows)
+        throw std::out_of_range("out of range");
+    elements[index] = vec;
+    return *this;
+}
+
+template <typename ValueType>
+matrix<ValueType>& matrix<ValueType>::replace_col(vector<ValueType> vec, int index)
+{
+    if(index < 0 || index >= cols)
+        throw std::out_of_range("out of range");
+    int i = 0;
+    for(auto& row : elements)
+        row[index] = vec[i++];
+    return *this;
+}
+
+template <typename ValueType>
+matrix<ValueType>& matrix<ValueType>::push_row(vector<ValueType> vec) 
+{
+    if(vec.size() != cols)
+        throw std::length_error("Dimentions must be the same");
+    elements.push_back(vec);
+    rows++;
+    return *this;
+}
+
+template <typename ValueType>
+matrix<ValueType>& matrix<ValueType>::push_col(vector<ValueType> vec) 
+{
+    if(vec.size() != rows)
+        throw std::length_error("Dimentions must be the same");
+    int i = 0;
+    for(auto& row : elements)
+        row.push_back(vec[i++]);
+    cols++;
+    return *this;
+}
+
+template <typename ValueType>
+vector<ValueType> matrix<ValueType>::get_row(int index)
+{
+    if(index < 0 || index >= rows)
+        throw std::out_of_range("out of range");
+    return elements[index];
+}
+
+template <typename ValueType>
+vector<ValueType> matrix<ValueType>::get_col(int index)
+{
+    if(index < 0 || index >= cols)
+        throw std::out_of_range("out of range");
+    vector<ValueType> vec(rows);
+    for(const auto& row : elements)
+        vec.push_back(row[index]);
+    return vec;
+}
+
+template <typename ValueType>
+matrix<ValueType>& matrix<ValueType>::erase_row(int index)
+{
+    if(index < 0 || index >= rows)
+        throw std::out_of_range("out of range");
+    elements.erase(elements.begin()+index);
+    rows--;
+    return *this;
+}
+
+template <typename ValueType>
+matrix<ValueType>& matrix<ValueType>::erase_col(int index)
+{
+    if(index < 0 || index >= cols)
+        throw std::out_of_range("out of range");
+    for(auto& row : elements)
+        row.erase(row.begin()+index);
+    cols--;
+    return *this;
 }
 
 template <typename ValueType>
@@ -481,3 +616,5 @@ matrix<ValueType> operator/(matrix<ValueType> m1, const ValueType& val)
 {
     return m1 /= val;
 }
+
+#endif

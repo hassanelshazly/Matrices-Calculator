@@ -7,8 +7,9 @@
 
 using namespace std;
 
-vector<string>& strip(vector<string>& v)
+vector<string> strip(const vector<string>& input)
 {   
+    vector<string> v = input;
     for(string& s : v) 
     {
         while(s[0] == ' ') 
@@ -17,6 +18,17 @@ vector<string>& strip(vector<string>& v)
             s.erase(s.length()-1, 1);
     }
     return v; 
+}
+
+string strip(const string& input)
+{   
+    string s = input;
+    while(s[0] == ' ') 
+        s.erase(0, 1) ;
+    while(s[s.length()-1] == ' ') 
+        s.erase(s.length()-1, 1);
+
+    return s; 
 }
 
 vector<string> split(const string& s, char b)
@@ -36,6 +48,16 @@ vector<string> split(const string& s, char b)
     }
     v.push_back(s.substr(j,n-j));
     return v ;
+}
+
+string clearSpaces(const string& s)
+{
+    string input = s;
+    string::iterator new_end = unique(input.begin(), input.end(), [] (const char &x, const char &y) {
+       return x == y and x == ' ';
+    });
+    input.erase(new_end, input.end());
+    return input;
 }
 
 vector<float> tofloat(const vector<string>& input)
@@ -95,10 +117,11 @@ vector<vector<float>> parse_floatInput(string& input)
     if(input.size() < 2)
         return vec;
     input.erase(input.begin()) ; 
-    input.erase(input.end()-1) ; 
+    input.erase(input.end()-1) ;
+    input = clearSpaces(input); 
     vector<string> rows = split(input, ';');
     for(const auto& row : rows)
-        vec.push_back(tofloat(split(row, ' ')));
+        vec.push_back(tofloat(split(strip(row), ' ')));
     return vec;
 }
 
@@ -108,10 +131,11 @@ vector<vector<complex<float>>> parse_complexInput(string& input)
     if(input.size() < 2)
         return vec;
     input.erase(input.begin()) ; 
-    input.erase(input.end()-1) ; 
+    input.erase(input.end()-1) ;
+    input = clearSpaces(input); 
     vector<string> rows = split(input, ';');
     for(const auto& row : rows)
-        vec.push_back(toComplex(split(row, ' ')));
+        vec.push_back(toComplex(split(strip(row), ' ')));
     return vec;
 }
 
