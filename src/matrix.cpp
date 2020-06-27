@@ -1,5 +1,23 @@
-#ifndef _MAREIX_H_
-#define _MAREIX_H_
+/******************************************************************************
+ * Copyright (C) 2019 by Hassan El-shazly
+ *
+ * Redistribution, modification or use of this software in source or binary
+ * forms is permitted as long as the files maintain this copyright.
+ * Hassan El-shazly is not liable for any misuse of this material. 
+ *
+ *****************************************************************************/
+/**
+ * @file matrix.cpp
+ * @brief 
+ * 
+ * This file implements the <code>matrix</code> class, which provides an
+ * efficient, safe, convenient matrix type in C++ that can be used in 
+ * mathematical computations
+ *
+ * @author Hassan El-shazly
+ * @date Last Edit Jun-2020
+ *
+ */
 
 #include <vector>
 #include <utility>
@@ -7,75 +25,14 @@
 #include <iostream>
 #include <sstream>
 
-using std::vector ;
-
-template <typename ValueType>
-class matrix
-{
-public:
-
-    matrix();
-    matrix(int row, int col);
-    matrix(const matrix<ValueType>& m);
-    matrix(matrix<ValueType>&& m);
-    matrix(const vector<vector<ValueType>>& vec);
-    matrix(vector<vector<ValueType>>&& vec);
-
-    matrix<ValueType>& operator=(const matrix<ValueType>& m);
-    matrix<ValueType>& operator=(matrix<ValueType>&& m);
-    matrix<ValueType>& operator=(const vector<vector<ValueType>>& vec);
-    matrix<ValueType>& operator=(vector<vector<ValueType>>&& vec);
-    bool operator==(const matrix<ValueType>& m);
-    bool operator!=(const matrix<ValueType>& m);
-
-    matrix<ValueType>& operator+=(const matrix<ValueType>& m);
-    matrix<ValueType>& operator-=(const matrix<ValueType>& m);
-    matrix<ValueType>& operator*=(const matrix<ValueType>& m); // scaler multiplication
-    matrix<ValueType>& operator/=(const matrix<ValueType>& m); // scaler division
-    matrix<ValueType>& operator+=(const ValueType& val);
-    matrix<ValueType>& operator-=(const ValueType& val);
-    matrix<ValueType>& operator*=(const ValueType& val);
-    matrix<ValueType>& operator/=(const ValueType& val);
-    vector<ValueType>& operator[](int rowIndex);
-
-    matrix<ValueType> multiply(matrix<ValueType>& m); // matrices multiplication
-    matrix<ValueType>& invert();
-    matrix<ValueType> transpose();
-    matrix<ValueType> power(int n);
-
-    matrix<ValueType>& replace_row(vector<ValueType> vec, int index);
-    matrix<ValueType>& replace_col(vector<ValueType> vec, int index);
-    matrix<ValueType>& push_row(vector<ValueType> vec);
-    matrix<ValueType>& push_col(vector<ValueType> vec);
-    vector<ValueType> get_row(int index);
-    vector<ValueType> get_col(int index);
-    matrix<ValueType>& erase_row(int index);
-    matrix<ValueType>& erase_col(int index);
-
-
-    matrix<ValueType>& print_r();
-    matrix<ValueType>& print_r(std::ostream& os);
-    matrix<ValueType>& print_l(); // matlab format
-    matrix<ValueType>& print_l(std::ostream& os);
-
-    matrix<ValueType>& resize(int row, int col); // This doesn't guarantee the matrix data still valid
-    std::pair<int, int> getDim();
-    int getR();
-    int getC();
-    static std::pair<int, int> check_dim(const vector<vector<ValueType>>& vec);
-
-    template <typename T> friend
-    std::ostream& operator<<(std::ostream& os,const matrix<T>& m);
-    template <typename T> friend
-    matrix<T> subMatrix(matrix<T> m, int row, int col);
-private:
-    int rows ; int cols ;
-    vector<vector<ValueType>> elements;
-};
+#include "matrix.h"
 
 template <typename ValueType>
 matrix<ValueType>::matrix()
-    : rows(0), cols(0) {}
+    : rows(0), cols(0) 
+{
+    // do nothing
+}
 
 template <typename ValueType>
 matrix<ValueType>::matrix(int row, int col)
@@ -88,11 +45,17 @@ matrix<ValueType>::matrix(int row, int col)
 
 template <typename ValueType>
 matrix<ValueType>::matrix(const matrix<ValueType>& m)
-    : rows(m.rows), cols(m.cols), elements(m.elements) {}
+    : rows(m.rows), cols(m.cols), elements(m.elements)
+{
+    // do nothing
+} 
 
 template <typename ValueType>
 matrix<ValueType>::matrix(matrix<ValueType>&& m)
-    : rows(m.rows), cols(m.cols), elements(std::move(m.elements)) {}
+    : rows(m.rows), cols(m.cols), elements(std::move(m.elements))
+{
+    // do nothing
+}
 
 template <typename ValueType>
 matrix<ValueType>::matrix(const vector<vector<ValueType>>& vec)
@@ -235,24 +198,22 @@ matrix<ValueType>& matrix<ValueType>::resize(int row, int col)
 }
 
 template <typename ValueType>
-inline std::pair<int, int> matrix<ValueType>::getDim()
+inline std::pair<int, int> matrix<ValueType>::get_dim()
 {
     return std::make_pair(rows, cols);
 }
 
 template <typename ValueType>
-inline int matrix<ValueType>::getR()
+inline int matrix<ValueType>::get_r()
 {
     return rows;
 }
 
 template <typename ValueType>
-inline int matrix<ValueType>::getC()
+inline int matrix<ValueType>::get_c()
 {
     return cols;
 }
-
-
 
 template <typename ValueType>
 matrix<ValueType>& matrix<ValueType>::operator+=(const matrix<ValueType>& m)
@@ -268,10 +229,13 @@ matrix<ValueType>& matrix<ValueType>::operator+=(const matrix<ValueType>& m)
         });
         itm++;
     });
-    /* another simple way, use one only */
+  
+    /* Another simple way, use one only */
+  
     // for(int i=0; i<rows; i++)
     //     for(int j=0; j<cols; j++)
     //         elements[i][j] += m.elements[i][j] ;
+  
     return *this;
 }
 
@@ -289,10 +253,13 @@ matrix<ValueType>& matrix<ValueType>::operator-=(const matrix<ValueType>& m)
         });
         itm++;
     });
-    /* another simple way, use one only */
+   
+    /* Another simple way, use one only */
+   
     // for(int i=0; i<rows; i++)
     //     for(int j=0; j<cols; j++)
     //         elements[i][j] -= m.elements[i][j] ;
+  
     return *this;
 }
 
@@ -310,7 +277,7 @@ matrix<ValueType>& matrix<ValueType>::operator*=(const matrix<ValueType>& m)
         });
         itm++;
     });
-    /* another simple way, use one only */
+    /* Another simple way, use one only */
     // for(int i=0; i<rows; i++)
     //     for(int j=0; j<cols; j++)
     //         elements[i][j] *= m.elements[i][j] ;
@@ -331,10 +298,13 @@ matrix<ValueType>& matrix<ValueType>::operator/=(const matrix<ValueType>& m)
         });
         itm++;
     });
-    /* another simple way, use one only */
+ 
+    /* Another simple way, use one only */
+
     // for(int i=0; i<rows; i++)
     //     for(int j=0; j<cols; j++)
     //         elements[i][j] /= m.elements[i][j] ;
+
     return *this;
 }
 
@@ -399,7 +369,7 @@ matrix<ValueType> matrix<ValueType>::power(int n)
 }
 
 template <typename ValueType>
-matrix<ValueType>& matrix<ValueType>::invert()
+matrix<ValueType> matrix<ValueType>::invert()
 {
     if(rows != cols)
         throw std::length_error("Error: check matrix dimentions");
@@ -419,8 +389,7 @@ matrix<ValueType>& matrix<ValueType>::invert()
     ValueType det = determinant(*this);
     if(det == static_cast<ValueType>(0))
         throw std::out_of_range("Error: Determinant equal zero");
-    *this = adj.transpose() / det;
-    return *this;
+    return adj.transpose() /= det;
 }
 
 template <typename ValueType>
@@ -431,6 +400,12 @@ matrix<ValueType> matrix<ValueType>::transpose()
         for(int j=0; j<cols; j++)
             res[j][i] = elements[i][j];
     return res;
+}
+
+template <typename ValueType>
+inline ValueType matrix<ValueType>::det()
+{
+    return determinant(*this);
 }
 
 template <typename ValueType>
@@ -547,21 +522,22 @@ std::ostream& operator<<(std::ostream& os, const matrix<ValueType>& m)
 template <typename ValueType>
 matrix<ValueType> subMatrix(matrix<ValueType> m, int row, int col)
 {
-    for(int i = 0; i<m.getR(); i++)
+    for(int i = 0; i < m.get_r(); i++)
         m[i].erase(m[i].begin() + col);
     m.elements.erase(m.elements.begin() + row);
-    return matrix<ValueType>(m.elements);
+    return matrix<ValueType>(std::move(m.elements));
 }
 
 template <typename ValueType>
 ValueType determinant(matrix<ValueType> m)
 {
-    if(m.getR() != m.getC())
+    if(m.get_r() != m.get_c())
         throw std::length_error("Error: check matrix dimentions");
-    if(m.getR() == 1) return m[0][0] ;
+    if(m.get_r() == 1) return m[0][0] ;
+   
     ValueType det = ValueType();
     ValueType sign = 1 ;
-    for(int i = 0; i<m.getC(); i++)
+    for(int i = 0; i<m.get_c(); i++)
     {
         det += m[0][i] * determinant(subMatrix(m, 0, i)) * sign;
         sign = -sign ;
@@ -569,52 +545,50 @@ ValueType determinant(matrix<ValueType> m)
     return det;
 }
 
-template <typename ValueType>
-matrix<ValueType> operator+(matrix<ValueType> m1, matrix<ValueType> m2)
+template <typename ValueType> inline
+matrix<ValueType> operator+(matrix<ValueType> m1, const matrix<ValueType>& m2)
 {
     return m1 += m2;
 }
 
-template <typename ValueType>
-matrix<ValueType> operator-(matrix<ValueType> m1, matrix<ValueType> m2)
+template <typename ValueType> inline
+matrix<ValueType> operator-(matrix<ValueType> m1, const matrix<ValueType>& m2)
 {
     return m1 -= m2;
 }
 
-template <typename ValueType>
-matrix<ValueType> operator*(matrix<ValueType> m1, matrix<ValueType> m2)
+template <typename ValueType> inline
+matrix<ValueType> operator*(matrix<ValueType> m1, const matrix<ValueType>& m2)
 {
     return m1 *= m2;
 }
 
-template <typename ValueType>
-matrix<ValueType> operator/(matrix<ValueType> m1, matrix<ValueType> m2)
+template <typename ValueType> inline
+matrix<ValueType> operator/(matrix<ValueType> m1, const matrix<ValueType>& m2)
 {
     return m1 /= m2;
 }
 
-template <typename ValueType>
+template <typename ValueType> inline
 matrix<ValueType> operator+(matrix<ValueType> m1, const ValueType& val)
 {
     return m1 += val;
 }
 
-template <typename ValueType>
+template <typename ValueType> inline
 matrix<ValueType> operator-(matrix<ValueType> m1, const ValueType& val)
 {
     return m1 -= val;
 }
 
-template <typename ValueType>
+template <typename ValueType> inline
 matrix<ValueType> operator*(matrix<ValueType> m1, const ValueType& val)
 {
     return m1 *= val;
 }
 
-template <typename ValueType>
+template <typename ValueType> inline
 matrix<ValueType> operator/(matrix<ValueType> m1, const ValueType& val)
 {
     return m1 /= val;
 }
-
-#endif

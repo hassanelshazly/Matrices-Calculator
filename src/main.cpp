@@ -3,9 +3,81 @@
 #include <utility>
 #include <cstdlib>
 #include <complex>
+#include <algorithm>
+
 #include "matrix.h"
 
 using namespace std;
+
+vector<string> strip(const vector<string>& input);
+string strip(const string& input);
+vector<string> split(const string& s, char b);
+string clearSpaces(const string& s);
+
+vector<float> tofloat(const vector<string>& input);
+ostream& operator<<(ostream& os, complex<float> c);
+vector<vector<float>> parse_floatInput(string& input);
+vector<vector<complex<float>>> parse_complexInput(string& input);
+
+
+int main()
+{
+    matrix<complex<float>> matrix1, matrix2;
+    string s; getline(cin, s);
+    try
+    {
+        matrix1 = parse_complexInput(s);
+        string op; getline(cin, op);
+        if(op == "+")
+        {
+            getline(cin, s);
+            matrix2 = parse_complexInput(s) ;
+            (matrix1 += matrix2).print_l() ;
+        }
+        else if(op == "-")
+        {
+            getline(cin, s);
+            matrix2 = parse_complexInput(s) ;
+            (matrix1 -= matrix2).print_l() ;
+        }
+        else if(op == "*")
+        {
+            getline(cin, s);
+            matrix2 = parse_complexInput(s) ;
+            matrix1.multiply(matrix2).print_l() ;
+        }
+        else if(op == "^")
+        {
+            int n; cin >> n ;
+            matrix1.power(n).print_l();
+        }
+        else if(op == "T")
+        {
+            matrix1.transpose().print_l();
+        }
+         if(op == "D")
+        {
+            cout << determinant(matrix1);
+        }
+        else if(op == "I")
+        {
+            matrix1.invert().print_l();
+        }
+        else if(op == "/")
+        {
+            getline(cin, s);
+            matrix2 = parse_complexInput(s);
+            matrix2 = matrix2.invert();
+            matrix1.multiply(matrix2).print_l();
+        }
+    }
+    catch(...)
+    {
+        cout << "ERROR" ;
+        return 0 ;
+    }
+     
+}
 
 vector<string> strip(const vector<string>& input)
 {   
@@ -111,6 +183,7 @@ vector<complex<float>> toComplex(const vector<string>& input)
     return vec;
 }
 
+
 vector<vector<float>> parse_floatInput(string& input)
 {   
     vector<vector<float>> vec;
@@ -137,63 +210,4 @@ vector<vector<complex<float>>> parse_complexInput(string& input)
     for(const auto& row : rows)
         vec.push_back(toComplex(split(strip(row), ' ')));
     return vec;
-}
-
-
-int main()
-{
-    matrix<complex<float>> matrix1, matrix2;
-    string s; getline(cin, s);
-    try
-    {
-        matrix1 = parse_complexInput(s);
-        string op; getline(cin, op);
-        if(op == "+")
-        {
-            getline(cin, s);
-            matrix2 = parse_complexInput(s) ;
-            (matrix1 += matrix2).print_l() ;
-        }
-        else if(op == "-")
-        {
-            getline(cin, s);
-            matrix2 = parse_complexInput(s) ;
-            (matrix1 -= matrix2).print_l() ;
-        }
-        else if(op == "*")
-        {
-            getline(cin, s);
-            matrix2 = parse_complexInput(s) ;
-            matrix1.multiply(matrix2).print_l() ;
-        }
-        else if(op == "^")
-        {
-            int n; cin >> n ;
-            matrix1.power(n).print_l();
-        }
-        else if(op == "T")
-        {
-            matrix1.transpose().print_l();
-        }
-         if(op == "D")
-        {
-            cout << determinant(matrix1);
-        }
-        else if(op == "I")
-        {
-            matrix1.invert().print_l();
-        }
-        else if(op == "/")
-        {
-            getline(cin, s);
-            matrix2 = parse_complexInput(s);
-            matrix1.multiply(matrix2.invert()).print_l();
-        }
-    }
-    catch(...)
-    {
-        cout << "ERROR" ;
-        return 0 ;
-    }
-     
 }
