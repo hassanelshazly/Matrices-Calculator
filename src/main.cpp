@@ -22,12 +22,14 @@ vector<vector<complex<float>>> parse_complexInput(string& input);
 
 int main()
 {
-    matrix<complex<float>> matrix1, matrix2;
-    string s; getline(cin, s);
     try
     {
+        matrix<complex<float>> matrix1, matrix2;
+        string s; getline(cin, s);
+        
         matrix1 = parse_complexInput(s);
         string op; getline(cin, op);
+        
         if(op == "+")
         {
             getline(cin, s);

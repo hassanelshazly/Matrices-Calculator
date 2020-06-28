@@ -1,19 +1,48 @@
-SOURCES = src/matrix.cpp src/main.cpp 
-INCLUDES = include
 
-CC 	= g++
-CFLAGS = -I$(INCLUDES)
+#------------------------------------------------------------------------------
+# Makefile used to build the project
+#
+# Use: make [TARGET]
+#
+# Build Targets:
+# 	   clean   :  remove all the gemerted files from
+# 				  the complier
+#	   All     :  The whole project
+#      main.out:  The whole project
+#	   %.o     :  %.cpp
+#
+# Platform Overrides:
+#      <Put a description of the supported Overrides here
+#
+#------------------------------------------------------------------------------
+SRC_DIR = src
+OBJ_DIR = obj
 
-OBJS = $(SOURCES:.cpp=.o)
+SOURCES  := $(wildcard ${SRC_DIR}/*.cpp)
+INCLUDES := include
+
+CC 		 = g++
+CPPFLAGS = -I$(INCLUDES) -MMD -MP
+
+OBJS := $(SOURCES:.cpp=.o)
+OBJS := $(patsubst ${SRC_DIR}/%,${OBJ_DIR}/%,$(OBJS))
+	
+DEPS   = $(OBJS:.o=.d)
 TARGET = main
 
-%.o : %.cpp
-	$(CC) -c $(CFLAGS) -o  $@ $^
+# Rule for genertaing .o files 
+$(OBJ_DIR)/%.o : $(SRC_DIR)/%.cpp
+	$(CC) -c $(CPPFLAGS) -o $@  $<
 
+# Rule for genertaing main.out file 
+$(TARGET).out :$(OBJS)	
+	$(CC)    $(CPPFLAGS) -o $@  $<
+	
+-include $(DEPS)  
 
-$(TARGET).out :$(OBJS)
-	$(CC) -o $(CFLAGS) $(TARGET).out  $(OBJS) 
+.PHONY: all
+all : $(TARGET).out
 
-matrix.o : matrix.h
-main.o : matrix.o
-
+.PHONY: clean
+clean : 
+	rm -rf $(OBJS) $(DEPS) $(TARGET).out
