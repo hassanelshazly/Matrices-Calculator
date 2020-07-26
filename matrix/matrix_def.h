@@ -2,8 +2,7 @@
  * Copyright (C) 2019 by Hassan El-shazly
  *
  * Redistribution, modification or use of this software in source or binary
- * forms is permitted as long as the files maintain this copyright.
- * Hassan El-shazly is not liable for any misuse of this material. 
+ * forms is permitted as long as the files maintain this copyright. 
  *
  *****************************************************************************/
 /**
@@ -214,7 +213,7 @@ public:
     matrix<ValueType> multiply(matrix<ValueType>& mat); 
     
     /**
-     * Multiply the two matrices
+     * Matrix inverse
      * @throw   length_error if columns != rows
      * @throw   out_of_range if determinant = zero
      * @returns a new matrix results from inverting
@@ -222,7 +221,7 @@ public:
     matrix<ValueType> invert();
     
     /**
-     * Multiply the two matrices
+     * Matrix transpose
      * @throw   length_error if columns != mat.rows
      * @returns a new matrix results from transposing
      * @bigoh O(rows x columns)
@@ -230,7 +229,7 @@ public:
     matrix<ValueType> transpose();
     
     /**
-     * Multiply the two matrices
+     * Matrix power
      * @throw   length_error if columns != rows
      * @returns a new matrix results from powering
      * @bigoh O(rows^3 x n)
