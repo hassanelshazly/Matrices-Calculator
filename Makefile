@@ -1,4 +1,3 @@
-
 #------------------------------------------------------------------------------
 # Makefile used to build the project
 #
@@ -11,15 +10,12 @@
 #      main.out:  The whole project
 #	   %.o     :  %.cpp
 #
-# Platform Overrides:
-#      <Put a description of the supported Overrides here
-#
 #------------------------------------------------------------------------------
 SRC_DIR = src
 OBJ_DIR = obj
 
 SOURCES  := $(wildcard ${SRC_DIR}/*.cpp)
-INCLUDES := include
+INCLUDES := matrix
 
 CC 		 = g++
 CPPFLAGS = -I$(INCLUDES) -MMD -MP
