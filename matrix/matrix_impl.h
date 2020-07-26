@@ -29,6 +29,7 @@
 #include <sstream>
 
 #include "matrix_def.h"
+#include "vector_arithmetic.h"
 
 template <typename ValueType>
 matrix<ValueType>::matrix()
@@ -47,15 +48,15 @@ matrix<ValueType>::matrix(int row, int col)
 }
 
 template <typename ValueType>
-matrix<ValueType>::matrix(const matrix<ValueType>& m)
-    : rows(m.rows), cols(m.cols), elements(m.elements)
+matrix<ValueType>::matrix(const matrix<ValueType>& mat)
+    : rows(mat.rows), cols(mat.cols), elements(mat.elements)
 {
     // do nothing
 } 
 
 template <typename ValueType>
-matrix<ValueType>::matrix(matrix<ValueType>&& m)
-    : rows(m.rows), cols(m.cols), elements(std::move(m.elements))
+matrix<ValueType>::matrix(matrix<ValueType>&& mat)
+    : rows(mat.rows), cols(mat.cols), elements(std::move(mat.elements))
 {
     // do nothing
 }
@@ -83,18 +84,18 @@ matrix<ValueType>::matrix(vector<vector<ValueType>>&& vec)
 }
 
 template <typename ValueType>
-matrix<ValueType>& matrix<ValueType>::operator=(const matrix<ValueType>& m)
+matrix<ValueType>& matrix<ValueType>::operator=(const matrix<ValueType>& mat)
 {
-    rows = m.rows; cols = m.cols;
-    elements = m.elements;
+    rows = mat.rows; cols = mat.cols;
+    elements = mat.elements;
     return *this;
 }
 
 template <typename ValueType>
-matrix<ValueType>& matrix<ValueType>::operator=(matrix<ValueType>&& m)
+matrix<ValueType>& matrix<ValueType>::operator=(matrix<ValueType>&& mat)
 {
-    rows = m.rows; cols = m.cols;
-    elements = std::move(m.elements);
+    rows = mat.rows; cols = mat.cols;
+    elements = std::move(mat.elements);
     return *this;
 }
 
@@ -123,15 +124,15 @@ matrix<ValueType>& matrix<ValueType>::operator=(vector<vector<ValueType>>&& vec)
 }
 
 template <typename ValueType>
-bool matrix<ValueType>::operator==(const matrix<ValueType>& m)
+bool matrix<ValueType>::operator==(const matrix<ValueType>& mat)
 {
-    return elements == m.elements ;
+    return elements == mat.elements ;
 }
 
 template <typename ValueType>
-bool matrix<ValueType>::operator!=(const matrix<ValueType>& m)
+bool matrix<ValueType>::operator!=(const matrix<ValueType>& mat)
 {
-    return elements != m.elements ;
+    return elements != mat.elements ;
 }
 
 template <typename ValueType>
@@ -207,23 +208,23 @@ inline std::pair<int, int> matrix<ValueType>::get_dim()
 }
 
 template <typename ValueType>
-inline int matrix<ValueType>::get_r()
+inline int matrix<ValueType>::get_rows()
 {
     return rows;
 }
 
 template <typename ValueType>
-inline int matrix<ValueType>::get_c()
+inline int matrix<ValueType>::get_cols()
 {
     return cols;
 }
 
 template <typename ValueType>
-matrix<ValueType>& matrix<ValueType>::operator+=(const matrix<ValueType>& m)
+matrix<ValueType>& matrix<ValueType>::operator+=(const matrix<ValueType>& mat)
 {
-    if(rows != m.rows || cols != m.cols)
+    if(rows != mat.rows || cols != mat.cols)
         throw std::length_error("matrix::addition -> Matrices dimentions must be the same") ;
-    auto itm = m.elements.begin();
+    auto itm = mat.elements.begin();
     std::for_each(elements.begin(), elements.end(), [&itm](auto& ite) {
         auto iitm = itm->begin();
         std::for_each(ite.begin(), ite.end(), [&iitm](auto& iite) {
@@ -237,17 +238,17 @@ matrix<ValueType>& matrix<ValueType>::operator+=(const matrix<ValueType>& m)
   
     // for(int i=0; i<rows; i++)
     //     for(int j=0; j<cols; j++)
-    //         elements[i][j] += m.elements[i][j] ;
+    //         elements[i][j] += mat.elements[i][j] ;
   
     return *this;
 }
 
 template <typename ValueType>
-matrix<ValueType>& matrix<ValueType>::operator-=(const matrix<ValueType>& m)
+matrix<ValueType>& matrix<ValueType>::operator-=(const matrix<ValueType>& mat)
 {
-    if(rows != m.rows || cols != m.cols)
+    if(rows != mat.rows || cols != mat.cols)
         throw std::length_error("matrix::subtraction -> Matrices dimentions must be the same") ;
-    auto itm = m.elements.begin();
+    auto itm = mat.elements.begin();
     std::for_each(elements.begin(), elements.end(), [&itm](auto& ite) {
         auto iitm = itm->begin();
         std::for_each(ite.begin(), ite.end(), [&iitm](auto& iite) {
@@ -261,17 +262,17 @@ matrix<ValueType>& matrix<ValueType>::operator-=(const matrix<ValueType>& m)
    
     // for(int i=0; i<rows; i++)
     //     for(int j=0; j<cols; j++)
-    //         elements[i][j] -= m.elements[i][j] ;
+    //         elements[i][j] -= mat.elements[i][j] ;
   
     return *this;
 }
 
 template <typename ValueType>
-matrix<ValueType>& matrix<ValueType>::operator*=(const matrix<ValueType>& m)
+matrix<ValueType>& matrix<ValueType>::operator*=(const matrix<ValueType>& mat)
 {
-    if(rows != m.rows || cols != m.cols)
+    if(rows != mat.rows || cols != mat.cols)
         throw std::length_error("matrix::scalar_multiplication -> Matrices dimentions must be the same") ;
-    auto itm = m.elements.begin();
+    auto itm = mat.elements.begin();
     std::for_each(elements.begin(), elements.end(), [&itm](auto& ite) {
         auto iitm = itm->begin();
         std::for_each(ite.begin(), ite.end(), [&iitm](auto& iite) {
@@ -283,16 +284,16 @@ matrix<ValueType>& matrix<ValueType>::operator*=(const matrix<ValueType>& m)
     /* Another simple way, use one only */
     // for(int i=0; i<rows; i++)
     //     for(int j=0; j<cols; j++)
-    //         elements[i][j] *= m.elements[i][j] ;
+    //         elements[i][j] *= mat.elements[i][j] ;
     return *this;
 }
 
 template <typename ValueType>
-matrix<ValueType>& matrix<ValueType>::operator/=(const matrix<ValueType>& m)
+matrix<ValueType>& matrix<ValueType>::operator/=(const matrix<ValueType>& mat)
 {
-    if(rows != m.rows || cols != m.cols)
+    if(rows != mat.rows || cols != mat.cols)
         throw std::length_error("matrix::divsion -> Matrices dimentions must be the same") ;
-    auto itm = m.elements.begin();
+    auto itm = mat.elements.begin();
     std::for_each(elements.begin(), elements.end(), [&itm](auto& ite) {
         auto iitm = itm->begin();
         std::for_each(ite.begin(), ite.end(), [&iitm](auto& iite) {
@@ -306,7 +307,7 @@ matrix<ValueType>& matrix<ValueType>::operator/=(const matrix<ValueType>& m)
 
     // for(int i=0; i<rows; i++)
     //     for(int j=0; j<cols; j++)
-    //         elements[i][j] /= m.elements[i][j] ;
+    //         elements[i][j] /= mat.elements[i][j] ;
 
     return *this;
 }
@@ -348,15 +349,15 @@ matrix<ValueType>& matrix<ValueType>::operator/=(const ValueType val)
 }
 
 template <typename ValueType>
-matrix<ValueType> matrix<ValueType>::multiply(matrix<ValueType>& m)
+matrix<ValueType> matrix<ValueType>::multiply(matrix<ValueType>& mat)
 {
-    if(cols != m.rows)
+    if(cols != mat.rows)
         throw std::length_error("matrix::multiply -> check matrices dimentions");
-    matrix<ValueType> res(rows, m.cols);
+    matrix<ValueType> res(rows, mat.cols);
     for (int i = 0; i < rows; i++)
-        for (int j = 0; j < m.cols; j++)
-            for (int k = 0 ; k < m.rows ; k++ )
-                res[i][j] += elements[i][k] * m[k][j];
+        for (int j = 0; j < mat.cols; j++)
+            for (int k = 0 ; k < mat.rows ; k++ )
+                res[i][j] += elements[i][k] * mat[k][j];
     return res;
 }
 
@@ -383,7 +384,7 @@ matrix<ValueType> matrix<ValueType>::invert()
     {
         for(int j = 0; j < cols; j++)
         {
-            adj[i][j] = determinant(subMatrix(*this, i, j)) * signCol;
+            adj[i][j] = determinant(sub_matrix(*this, i, j)) * signCol;
             signCol = -signCol;
         }
         signRow = -signRow;
@@ -409,6 +410,18 @@ template <typename ValueType>
 inline ValueType matrix<ValueType>::det()
 {
     return determinant(*this);
+}
+
+template <typename ValueType>
+inline ValueType matrix<ValueType>::det_recursive()
+{
+    return determinant_recursive(*this);
+}
+
+template <typename ValueType>
+inline vector<ValueType> matrix<ValueType>::back_sub(vector<ValueType> vec)
+{
+    return back_substitution(*this, vec);
 }
 
 template <typename ValueType>
@@ -543,9 +556,9 @@ vector<ValueType>& matrix<ValueType>::operator[](int rowIndex)
 }
 
 template <typename ValueType>
-std::ostream& operator<<(std::ostream& os, const matrix<ValueType>& m)
+std::ostream& operator<<(std::ostream& os, const matrix<ValueType>& mat)
 {
-    for(const auto& items : m.elements)
+    for(const auto& items : mat.elements)
     {
         for(const auto& element : items)
             os << element << " " ;
@@ -555,29 +568,108 @@ std::ostream& operator<<(std::ostream& os, const matrix<ValueType>& m)
 }
 
 template <typename ValueType>
-matrix<ValueType> subMatrix(matrix<ValueType> m, int row, int col)
+matrix<ValueType> sub_matrix(matrix<ValueType> mat, int row, int col)
 {
-    for(int i = 0; i < m.get_r(); i++)
-        m[i].erase(m[i].begin() + col);
-    m.elements.erase(m.elements.begin() + row);
-    return matrix<ValueType>(std::move(m.elements));
+    for(int i = 0; i < mat.get_rows(); i++)
+        mat[i].erase(mat[i].begin() + col);
+    mat.elements.erase(mat.elements.begin() + row);
+    return matrix<ValueType>(std::move(mat.elements));
 }
 
 template <typename ValueType>
-ValueType determinant(matrix<ValueType> m)
+ValueType determinant_recursive(matrix<ValueType> mat)
 {
-    if(m.get_r() != m.get_c())
-        throw std::length_error("matrix::determinant -> check matrix dimentions");
-    if(m.get_r() == 1) return m[0][0] ;
+    if(mat.get_rows() != mat.get_cols())
+        throw std::length_error("matrix::determinant_recursive -> check matrix dimentions");
+    if(mat.get_rows() == 1) return mat[0][0] ;
    
     ValueType det = ValueType();
     ValueType sign = 1 ;
-    for(int i = 0; i<m.get_c(); i++)
+    for(int i = 0; i<mat.get_cols(); i++)
     {
-        det += m[0][i] * determinant(subMatrix(m, 0, i)) * sign;
+        det += mat[0][i] * determinant_recursive(sub_matrix(mat, 0, i)) * sign;
         sign = -sign ;
     }
     return det;
+}
+
+template <typename ValueType>
+ValueType determinant(matrix<ValueType> mat)
+{
+    using namespace vector_arithmetic_operations;
+
+    if(mat.get_rows() != mat.get_cols())
+        throw std::length_error("matrix::determinant -> check matrix dimentions");
+    ValueType sign = 1 ;
+    for(int i = 0; i < mat.get_rows(); i++)
+    {
+        // find max in this col
+        ValueType max = mat[i][i];
+        int index_max = i;
+        for(int k = i+1; k < mat.get_rows(); k++) 
+        {
+            if(abs(mat[k][i]) > abs(max))
+            {
+                max = mat[k][i];
+                index_max = k;
+            }
+        }
+        // swap the max to the beginging
+        if(index_max != i)
+        {
+            mat.swap_rows(i, index_max);
+            sign -= 1 ;
+        }
+        // elemenate the numbers blow 
+        for(int j = i+1; j < mat.get_rows(); j++)
+        {
+            mat[j] += mat[i] * (-mat[j][i]/mat[i][i]);
+            mat[j][i] = 0;
+        } 
+    }
+    // calc the determinant
+    ValueType det_val = static_cast<ValueType>(1);
+    for(int i = 0; i < mat.get_rows(); i++)
+        det_val *= mat[i][i];
+    return det_val * sign;
+}
+
+
+template <typename ValueType>
+vector<ValueType> back_substitution(matrix<ValueType> mat, vector<ValueType> vec)
+{
+    using namespace vector_arithmetic_operations;
+    
+    if(mat.get_rows() != mat.get_cols())
+        throw std::length_error("back_substitution -> check matrix dimentions");
+    mat.push_col(vec);
+    for(int i = 0; i < mat.get_rows(); i++)
+    {
+        ValueType max = mat[i][i];
+        int index_max = i;
+        for(int k = i+1; k < mat.get_rows(); k++)
+        {
+            if(abs(mat[k][i]) > abs(max))
+            {
+                max = mat[k][i];
+                index_max = k;
+            }
+        }
+        mat.swap_rows(i, index_max);
+        for(int j = i+1; j < mat.get_rows(); j++)
+        {
+            mat[j] += mat[i] * (-mat[j][i] / mat[i][i]);
+            mat[j][i] = 0;
+        }
+    }
+    vec = mat.get_col(mat.get_cols()-1);
+    for(int i = mat.get_rows()-1; i >= 0; i--)
+    {
+        for(int j = i+1; j < mat.get_rows(); j++)
+            vec[i] -= mat[i][j] * vec[j] ;
+        vec[i] /= mat[i][i];
+    }
+    return vec;
 }
 
 template <typename ValueType> inline

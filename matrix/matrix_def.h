@@ -48,13 +48,13 @@ public:
      * Copy constructor
      * @bigoh O(rows x columns)
      */
-    matrix(const matrix<ValueType>& m);
+    matrix(const matrix<ValueType>& mat);
 
     /**
      * Move constructor
      * @bigoh O(1)
      */
-    matrix(matrix<ValueType>&& m);
+    matrix(matrix<ValueType>&& mat);
 
     /**
      * Initializes a new matrix from a given STL vector of vectors
@@ -77,7 +77,7 @@ public:
      *          be used in further calculations 
      * @bigoh O(rows x columns)
      */
-    matrix<ValueType>& operator=(const matrix<ValueType>& m);
+    matrix<ValueType>& operator=(const matrix<ValueType>& mat);
 
     /**
      * Move assignment constructor
@@ -85,7 +85,7 @@ public:
      *          be used in further calculations 
      * @bigoh O(1)
      */
-    matrix<ValueType>& operator=(matrix<ValueType>&& m);
+    matrix<ValueType>& operator=(matrix<ValueType>&& mat);
 
     /**
      * Assignment from STL vector of vectors 
@@ -111,14 +111,14 @@ public:
      * The ValueType must have an == operator.
      * @bigoh O(rows x columns)
      */
-    bool operator==(const matrix<ValueType>& m);
+    bool operator==(const matrix<ValueType>& mat);
     
     /**
      * Compares two matrices for inequality.
      * The ValueType must have a != operator.
      * @bigoh O(rows x columns)
      */
-    bool operator!=(const matrix<ValueType>& m);
+    bool operator!=(const matrix<ValueType>& mat);
 
     /**
      * Overloads <code>+=</code> for addition.
@@ -128,7 +128,7 @@ public:
      * @returns Reference to the current object
      * @bigoh   O(rows x columns x additon operation)
      */
-    matrix<ValueType>& operator+=(const matrix<ValueType>& m);
+    matrix<ValueType>& operator+=(const matrix<ValueType>& mat);
 
     /**
      * Overloads <code>-=</code> for subtraction.
@@ -138,7 +138,7 @@ public:
      * @returns Reference to the current object
      * @bigoh   O(rows x columns x subtraction operation)
      */
-    matrix<ValueType>& operator-=(const matrix<ValueType>& m);
+    matrix<ValueType>& operator-=(const matrix<ValueType>& mat);
 
     /**
      * Overloads <code>*=</code> for scaler multiplication.
@@ -148,7 +148,7 @@ public:
      * @returns Reference to the current object
      * @bigoh   O(rows x columns x multiplication operation)
      */
-    matrix<ValueType>& operator*=(const matrix<ValueType>& m);
+    matrix<ValueType>& operator*=(const matrix<ValueType>& mat);
 
     /**
      * Overloads <code>/=</code> for scaler division.
@@ -158,7 +158,7 @@ public:
      * @returns Reference to the current object
      * @bigoh   O(rows x columns x division operation)
      */
-    matrix<ValueType>& operator/=(const matrix<ValueType>& m);
+    matrix<ValueType>& operator/=(const matrix<ValueType>& mat);
 
     /**
      * Add every item in the matrix to val.
@@ -207,11 +207,11 @@ public:
 
     /**
      * Multiply the two matrices
-     * @throw   length_error if columns != m.rows
+     * @throw   length_error if columns != mat.rows
      * @returns a new matrix results from multiplication
-     * @bigoh O(rows x columns x m.columns)
+     * @bigoh O(rows x columns x mat.columns)
      */
-    matrix<ValueType> multiply(matrix<ValueType>& m); 
+    matrix<ValueType> multiply(matrix<ValueType>& mat); 
     
     /**
      * Multiply the two matrices
@@ -223,7 +223,7 @@ public:
     
     /**
      * Multiply the two matrices
-     * @throw   length_error if columns != m.rows
+     * @throw   length_error if columns != mat.rows
      * @returns a new matrix results from transposing
      * @bigoh O(rows x columns)
      */
@@ -237,12 +237,29 @@ public:
      */
     matrix<ValueType> power(int n);
 
-    /**
-     * @returns the Determinant of the matrix
+   /**
+     * @returns the Determinant of the given matrix using 
+     *          recursive defintion
      * @throw   length_error if it's not a squre matrix
-     * @bigoh O(1)
+     */
+    ValueType det_recursive();
+
+   /**
+     * @returns the Determinant of the given matrix using 
+     *          Gaussian elimination algoithm
+     * @throw   length_error if it's not a squre matrix
      */
     ValueType det();
+
+    /**
+     * function used to perform Back Substitution (Gaussian Elimination) 
+     * algorithm to solve system of linear equations 
+     * 
+     * @param   vec constants vector
+     * 
+     * @returns vector of the results
+     */
+    vector<ValueType> back_sub(vector<ValueType> vec);
 
     /**
      * Replace row(index)
@@ -371,13 +388,13 @@ public:
      * @returns the number of rows
      * @bigoh O(1)
      */
-    int get_r();
+    int get_rows();
 
     /**
      * @returns the number of columns
      * @bigoh O(1)
      */
-    int get_c();
+    int get_cols();
 
 
 
@@ -484,23 +501,44 @@ public:
      * as a native type.
      */
     template <typename T> friend
-    std::ostream& operator<<(std::ostream& os, const matrix<T>& m);
+    std::ostream& operator<<(std::ostream& os, const matrix<T>& mat);
 
     /**
-     * @returns the Determinant of the given matrix
+     * @returns the Determinant of the given matrix using 
+     *          recursive defintion
      * @throw   length_error if it's not a squre matrix
      */
     template <typename T> friend
-    T determinant(matrix<T> m);
+    T determinant_recursive(matrix<T> mat);
+
+    /**
+     * @returns the Determinant of the given matrix using 
+     *          Gaussian elimination algoithm
+     * @throw   length_error if it's not a squre matrix
+     */
+    template <typename T> friend
+    T determinant(matrix<T> mat);
     
     /**
-     * @helper  function used to get submatrices used in determint 
+     * @helper  function used to get submatrices used in determinant 
      *          calculations.
      * @returns matrix with dimensions <rows-1, columns-1>
      *          the specified row and col are erasrd
      */
     template <typename T> friend
-    matrix<T> subMatrix(matrix<T> m, int row, int col);
+    matrix<T> sub_matrix(matrix<T> mat, int row, int col);
+
+    /**
+     * function used to perform Back Substitution (Gaussian Elimination) 
+     * algorithm to solve system of linear equations 
+     * 
+     * @param   mat coefficient matrix
+     * @param   vec constants vector
+     * 
+     * @returns vector of the results
+     */
+    template <typename T> friend
+    vector<T> back_substitution(matrix<T> mat, vector<T> vec);
 
 private:
     int rows ; int cols ;
