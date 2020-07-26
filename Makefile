@@ -15,10 +15,11 @@ SRC_DIR = src
 OBJ_DIR = obj
 
 SOURCES  := $(wildcard ${SRC_DIR}/*.cpp)
-INCLUDES := matrix
+INCLUDES := -Imatrix \
+			-Ivector_arithmetic
 
 CC 		 = g++
-CPPFLAGS = -I$(INCLUDES) -MMD -MP
+CPPFLAGS = $(INCLUDES) -MMD -MP
 
 OBJS := $(SOURCES:.cpp=.o)
 OBJS := $(patsubst ${SRC_DIR}/%,${OBJ_DIR}/%,$(OBJS))

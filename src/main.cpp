@@ -19,7 +19,6 @@ ostream& operator<<(ostream& os, complex<float> c);
 vector<vector<float>> parse_floatInput(string& input);
 vector<vector<complex<float>>> parse_complexInput(string& input);
 
-
 int main()
 {
     try
@@ -59,7 +58,7 @@ int main()
         }
          if(op == "D")
         {
-            cout << determinant(matrix1);
+            cout << determinant_recursive(matrix1);
         }
         else if(op == "I")
         {
