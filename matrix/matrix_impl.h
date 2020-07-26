@@ -65,7 +65,7 @@ matrix<ValueType>::matrix(const vector<vector<ValueType>>& vec)
 {
     std::pair<int, int> p = check_dim(vec);
     if(p.first < 0)
-        throw std::length_error("Dimentions error");
+        throw std::length_error("matrix -> vectors dimentions are not consistent");
     rows = p.first;
     cols = p.second;
     elements = vec ;
@@ -76,7 +76,7 @@ matrix<ValueType>::matrix(vector<vector<ValueType>>&& vec)
 {
     std::pair<int, int> p = check_dim(vec);
     if(p.first < 0)
-        throw std::length_error("Dimentions error");
+        throw std::length_error("matrix -> vectors dimentions are not consistent");
     rows = p.first;
     cols = p.second;
     elements = std::move(vec) ;
@@ -103,7 +103,7 @@ matrix<ValueType>& matrix<ValueType>::operator=(const vector<vector<ValueType>>&
 {
     std::pair<int, int> p = check_dim(vec);
     if(p.first < 0)
-        throw std::length_error("Dimentions error");
+        throw std::length_error("matrix -> vectors dimentions are not consistent");
     rows = p.first;
     cols = p.second;
     elements = vec ;
@@ -115,7 +115,7 @@ matrix<ValueType>& matrix<ValueType>::operator=(vector<vector<ValueType>>&& vec)
 {
     std::pair<int, int> p = check_dim(vec);
     if(p.first < 0)
-        throw std::length_error("Dimentions error");
+        throw std::length_error("matrix -> vectors dimentions are not consistent");
     rows = p.first;
     cols = p.second;
     elements = std::move(vec) ;
@@ -222,7 +222,7 @@ template <typename ValueType>
 matrix<ValueType>& matrix<ValueType>::operator+=(const matrix<ValueType>& m)
 {
     if(rows != m.rows || cols != m.cols)
-        throw std::length_error("Error: Matrices dimentions must be the same") ;
+        throw std::length_error("matrix::addition -> Matrices dimentions must be the same") ;
     auto itm = m.elements.begin();
     std::for_each(elements.begin(), elements.end(), [&itm](auto& ite) {
         auto iitm = itm->begin();
@@ -246,7 +246,7 @@ template <typename ValueType>
 matrix<ValueType>& matrix<ValueType>::operator-=(const matrix<ValueType>& m)
 {
     if(rows != m.rows || cols != m.cols)
-        throw std::length_error("Error: Matrices dimentions must be the same") ;
+        throw std::length_error("matrix::subtraction -> Matrices dimentions must be the same") ;
     auto itm = m.elements.begin();
     std::for_each(elements.begin(), elements.end(), [&itm](auto& ite) {
         auto iitm = itm->begin();
@@ -270,7 +270,7 @@ template <typename ValueType>
 matrix<ValueType>& matrix<ValueType>::operator*=(const matrix<ValueType>& m)
 {
     if(rows != m.rows || cols != m.cols)
-        throw std::length_error("Error: Matrices dimentions must be the same") ;
+        throw std::length_error("matrix::scalar_multiplication -> Matrices dimentions must be the same") ;
     auto itm = m.elements.begin();
     std::for_each(elements.begin(), elements.end(), [&itm](auto& ite) {
         auto iitm = itm->begin();
@@ -291,7 +291,7 @@ template <typename ValueType>
 matrix<ValueType>& matrix<ValueType>::operator/=(const matrix<ValueType>& m)
 {
     if(rows != m.rows || cols != m.cols)
-        throw std::length_error("Error: Matrices dimentions must be the same") ;
+        throw std::length_error("matrix::divsion -> Matrices dimentions must be the same") ;
     auto itm = m.elements.begin();
     std::for_each(elements.begin(), elements.end(), [&itm](auto& ite) {
         auto iitm = itm->begin();
@@ -351,7 +351,7 @@ template <typename ValueType>
 matrix<ValueType> matrix<ValueType>::multiply(matrix<ValueType>& m)
 {
     if(cols != m.rows)
-        throw std::length_error("Error: check matrices dimentions");
+        throw std::length_error("matrix::multiply -> check matrices dimentions");
     matrix<ValueType> res(rows, m.cols);
     for (int i = 0; i < rows; i++)
         for (int j = 0; j < m.cols; j++)
@@ -364,7 +364,7 @@ template <typename ValueType>
 matrix<ValueType> matrix<ValueType>::power(int n)
 {
     if(rows != cols)
-        throw std::length_error("Error: check matrix dimentions");
+        throw std::length_error("matrix::power -> matrix must be square");
     matrix<ValueType> res = *this;
     for(int i = 0; i < n-1; i++)
         res = res.multiply(*this);
@@ -375,7 +375,7 @@ template <typename ValueType>
 matrix<ValueType> matrix<ValueType>::invert()
 {
     if(rows != cols)
-        throw std::length_error("Error: check matrix dimentions");
+        throw std::length_error("matrix::invert -> matrix must be square");
     matrix<ValueType> adj (rows, cols);
     ValueType signRow = 1 ;
     ValueType signCol = signRow ;
@@ -391,7 +391,7 @@ matrix<ValueType> matrix<ValueType>::invert()
     }
     ValueType det = determinant(*this);
     if(det == static_cast<ValueType>(0))
-        throw std::out_of_range("Error: Determinant equal zero");
+        throw std::out_of_range("matrix::invert -> Determinant equal zero");
     return adj.transpose() /= det;
 }
 
@@ -426,7 +426,9 @@ template <typename ValueType>
 matrix<ValueType>& matrix<ValueType>::replace_row(vector<ValueType> vec, int index)
 {
     if(index < 0 || index >= rows)
-        throw std::out_of_range("out of range");
+        throw std::out_of_range("matrix::replace_row -> trying to acess non existing row");
+    if(vec.size() != cols)
+        throw std::length_error("matrix::replace_row -> vector.size() must be equal to matrix::cols");
     elements[index] = vec;
     return *this;
 }
@@ -435,7 +437,9 @@ template <typename ValueType>
 matrix<ValueType>& matrix<ValueType>::replace_col(vector<ValueType> vec, int index)
 {
     if(index < 0 || index >= cols)
-        throw std::out_of_range("out of range");
+        throw std::out_of_range("matrix::replace_col -> trying to acess non existing column");
+     if(vec.size() != rows)
+        throw std::length_error("matrix::replace_col -> vector.size() must be equal to matrix::rows");
     int i = 0;
     for(auto& row : elements)
         row[index] = vec[i++];
@@ -446,7 +450,7 @@ template <typename ValueType>
 matrix<ValueType>& matrix<ValueType>::push_row(const vector<ValueType>& vec) 
 {
     if(vec.size() != cols)
-        throw std::length_error("Dimentions must be the same");
+        throw std::length_error("matrix::push_row -> vector.size() must be equal to matrix::cols");
     elements.push_back(vec);
     rows++;
     return *this;
@@ -456,7 +460,7 @@ template <typename ValueType>
 matrix<ValueType>& matrix<ValueType>::push_col(vector<ValueType> vec) 
 {
     if(vec.size() != rows)
-        throw std::length_error("Dimentions must be the same");
+        throw std::length_error("matrix::push_col -> vector.size() must be equal to matrix::rows");
     int i = 0;
     for(auto& row : elements)
         row.push_back(vec[i++]);
@@ -468,7 +472,7 @@ template <typename ValueType>
 vector<ValueType> matrix<ValueType>::get_row(int index)
 {
     if(index < 0 || index >= rows)
-        throw std::out_of_range("out of range");
+        throw std::out_of_range("matrix::get_row -> trying to acess non existing row");
     return elements[index];
 }
 
@@ -476,7 +480,7 @@ template <typename ValueType>
 vector<ValueType> matrix<ValueType>::get_col(int index)
 {
     if(index < 0 || index >= cols)
-        throw std::out_of_range("out of range");
+        throw std::out_of_range("matrix::get_col -> trying to acess non existing column");
     vector<ValueType> vec(rows);
     for(const auto& row : elements)
         vec.push_back(row[index]);
@@ -487,7 +491,7 @@ template <typename ValueType>
 matrix<ValueType>& matrix<ValueType>::erase_row(int index)
 {
     if(index < 0 || index >= rows)
-        throw std::out_of_range("out of range");
+        throw std::out_of_range("matrix::erase_row -> trying to erase non existing row");
     elements.erase(elements.begin()+index);
     rows--;
     return *this;
@@ -497,10 +501,38 @@ template <typename ValueType>
 matrix<ValueType>& matrix<ValueType>::erase_col(int index)
 {
     if(index < 0 || index >= cols)
-        throw std::out_of_range("out of range");
+        throw std::out_of_range("matrix::erase_col -> trying to erase non existing column");
     for(auto& row : elements)
         row.erase(row.begin()+index);
     cols--;
+    return *this;
+}
+
+template <typename ValueType>
+matrix<ValueType>& matrix<ValueType>::swap_rows(int row1, int row2)
+{
+    if((row1 < 0 || row1 >= rows) || (row2 < 0 || row2 >= rows))
+        throw std::out_of_range("matrix::swap_rows -> trying to swap non existing rows");
+    if(row1 != row2)
+    {
+        vector<ValueType> temp = elements[row1];
+        replace_row(elements[row2], row1);
+        elements[row2] = temp;
+    }
+    return *this;
+}
+
+template <typename ValueType>
+matrix<ValueType>& matrix<ValueType>::swap_cols(int col1, int col2)
+{
+    if((col1 < 0 || col1 >= cols) || (col1 < 0 || col1 >= cols))
+        throw std::out_of_range("matrix::swap_rows -> trying to swap non existing columns");
+    if(col1 != col2)
+    {
+        vector<ValueType> temp = get_col(col1);
+        replace_col(get_col(col2), col1);
+        replace_col(temp, col2);
+    }
     return *this;
 }
 
@@ -535,7 +567,7 @@ template <typename ValueType>
 ValueType determinant(matrix<ValueType> m)
 {
     if(m.get_r() != m.get_c())
-        throw std::length_error("Error: check matrix dimentions");
+        throw std::length_error("matrix::determinant -> check matrix dimentions");
     if(m.get_r() == 1) return m[0][0] ;
    
     ValueType det = ValueType();

@@ -291,7 +291,7 @@ public:
     vector<ValueType>  get_col(int index);
 
     /**
-     * Erase row(index)
+     * Erases row(index)
      * @throw   out_of_range if index out of range
      * @returns Reference to the current object
      * @bigoh O(columns)
@@ -299,13 +299,30 @@ public:
     matrix<ValueType>& erase_row(int index);
 
     /**
-     * Erase column(index)
+     * Erases column(index)
      * @throw   out_of_range if index out of range
      * @returns Reference to the current object
      * @bigoh O(rows)
      */
     matrix<ValueType>& erase_col(int index);
 
+    /**
+     * sawps row1 with row2
+     * stable if row1 equals row2
+     * @throw   out_of_range if indexes out of range
+     * @returns Reference to the current object
+     * @bigoh O(rows)
+     */
+    matrix<ValueType>& swap_rows(int row1, int row2);
+
+     /**
+     * sawps column1 with column2
+     * stable if column1 equals column2
+     * @throw   out_of_range if indexes out of range
+     * @returns Reference to the current object
+     * @bigoh O(columns)
+     */
+    matrix<ValueType>& swap_cols(int col1, int col2);
 
     /**
      * Prints the matrix in the standard format to the standard output
