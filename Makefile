@@ -16,6 +16,7 @@ OBJ_DIR = obj
 
 SOURCES  := $(wildcard ${SRC_DIR}/*.cpp)
 INCLUDES := -Imatrix \
+			-Iinclude \
 			-Ivector_arithmetic
 
 CC 		 = g++
@@ -33,7 +34,7 @@ $(OBJ_DIR)/%.o : $(SRC_DIR)/%.cpp
 
 # Rule for genertaing main.out file 
 $(TARGET).out :$(OBJS)	
-	$(CC)    $(CPPFLAGS) -o $@  $<
+	$(CC) -o $@ $(CPPFLAGS) $^
 	
 -include $(DEPS)  
 
