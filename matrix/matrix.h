@@ -24,7 +24,6 @@
 #ifndef _MAREIX_H_
 #define _MAREIX_H_
 
-
 #include "matrix_def.h"
 #include "matrix_impl.h"
 
